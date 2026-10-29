@@ -1,0 +1,95 @@
+#include <iostream> // n stacks in an array
+using namespace std;
+
+class NStack {
+public:
+    int *arr;
+    int *top;
+    int *next;
+
+    int n, s;
+    int freespot;
+
+    NStack(int N, int S) {
+        n = N;
+        s = S;
+
+        arr = new int[s];
+        top = new int[n];
+        next = new int[s];
+
+        for (int i = 0; i < n; i++) {
+            top[i] = -1;
+        }
+
+        for (int i = 0; i < s; i++) {
+            next[i] = i + 1;
+        }
+
+        next[s - 1] = -1;
+        freespot = 0;
+    }
+
+    bool push(int x, int m) {
+        // Guard clause for invalid stack numbers
+        if (m < 1 || m > n || freespot == -1) {
+            return false;
+        }
+
+        int index = freespot;
+        freespot = next[index];
+        arr[index] = x;
+        next[index] = top[m - 1];
+        top[m - 1] = index;
+
+        return true;
+    }
+
+    int pop(int m) {
+        // Guard clause for invalid stack numbers or underflow
+        if (m < 1 || m > n || top[m - 1] == -1) {
+            return -1; 
+        }
+
+        int index = top[m - 1];
+        top[m - 1] = next[index];
+        next[index] = freespot;
+        freespot = index;
+
+        return arr[index];
+    }
+
+    ~NStack() {
+        delete[] arr;
+        delete[] top;
+        delete[] next;
+    }
+};
+int main() {
+    int N, S, Q;
+    cout << "Enter Number of Stacks, Total Size, and Number of Queries: ";
+    cin >> N >> S >> Q;
+
+    NStack stacks(N, S);
+
+    while (Q--) {
+        cout << "\nEnter Query Type (1 for Push, 2 for Pop): ";
+        int type;
+        cin >> type;
+
+        if (type == 1) {
+            int x, m;
+            cout << "Enter Element and Stack Number: ";
+            cin >> x >> m;
+            if (stacks.push(x, m)) cout << "True" << endl;
+            else cout << "False" << endl;
+        }
+        else if (type == 2) {
+            int m;
+            cout << "Enter Stack Number to Pop: ";
+            cin >> m;
+            cout << "Popped Value: " << stacks.pop(m) << endl;
+        }
+    }
+    return 0;
+}
